@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Operations Research</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+ 
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap');
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #F1F5F9; 
+    color: #0F172A;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quiz-box {
+    background: #FFFFFF;
+    width: 95%;
+    max-width: 700px;
+    padding: 34px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+    border: 1px solid #E2E8F0;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: #0F172A;
+    letter-spacing: 0.6px;
+  }
+
+  .counter {
+    text-align: center;
+    font-size: 14px;
+    color: #64748B;
+    margin-bottom: 22px;
+  }
+
+  .question {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 22px;
+    line-height: 1.7;
+    color: #020617;
+  }
+
+  .options button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: #ECFEFF;
+    border: 1px solid #CBD5F5;
+    border-radius: 14px;
+    color: #0F172A;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .options button:hover {
+    border-color: #06B6D4;
+    background: #CFFAFE;
+  }
+
+  .options button.correct {
+    background: #DCFCE7;
+    border-color: #22C55E;
+    color: #14532D;
+  }
+
+  .options button.wrong {
+    background: #FEE2E2;
+    border-color: #DC2626;
+    color: #7F1D1D;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .nav-buttons button {
+    flex: 1;
+    padding: 14px;
+    background: #0F172A;
+    border: none;
+    border-radius: 14px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-buttons button:hover:not(:disabled) {
+    background: #020617;
+  }
+
+  .nav-buttons button:disabled {
+    background: #CBD5E1;
+    color: #64748B;
+    cursor: not-allowed;
+  }
+
+  .restart-btn {
+    margin-top: 26px;
+    width: 100%;
+    padding: 15px;
+    background: #06B6D4;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .restart-btn:hover {
+    background: #0891B2;
+  }
+
+  .result {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 24px;
+    font-weight: 600;
+    color: #0F172A;
+  }
+</style>
+
+</head>
+<body>
+
+
+<div class="quiz-box">
+  <h1>SWD 314 Quiz</h1>
+  <div class="counter" id="counter"></div>
+
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+
+  <div class="nav-buttons">
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+  </div>
+
+  <div class="result" id="result" style="display:none;"></div>
+
+<button class="restart-btn" id="restartBtn" style="display:none;">Restart Quiz</button>
+</div>
+
+<script>
+const quizData = [
+ 
+ {
+q: "Operations Research is primarily concerned with",
+o: [
+"Scientific decision making",
+"Computer programming",
+"Database design",
+"Network maintenance"
+],
+a: 0
+},
+{
+q: "Operations Research mainly uses which of the following approaches?",
+o: [
+"Intuitive approach",
+"Scientific and mathematical approach",
+"Trial and error approach",
+"Historical approach"
+],
+a: 1
+},
+{
+q: "Which of the following is NOT a phase in Operations Research methodology?",
+o: [
+"Problem formulation",
+"Model construction",
+"Programming language design",
+"Solution implementation"
+],
+a: 2
+},
+{
+q: "Linear Programming is used to",
+o: [
+"Optimize a linear objective function subject to constraints",
+"Design operating systems",
+"Create database tables",
+"Manage file systems"
+],
+a: 0
+},
+{
+q: "In Linear Programming, the function to be maximized or minimized is called",
+o: [
+"Constraint function",
+"Objective function",
+"Feasible function",
+"Boundary function"
+],
+a: 1
+},
+{
+q: "A feasible solution to a Linear Programming problem is one that",
+o: [
+"Satisfies all constraints",
+"Maximizes profit only",
+"Minimizes cost only",
+"Ignores decision variables"
+],
+a: 0
+},
+{
+q: "The graphical method of solving Linear Programming problems is applicable when",
+o: [
+"There are only two decision variables",
+"There are more than five variables",
+"There are no constraints",
+"The objective function is quadratic"
+],
+a: 0
+},
+{
+q: "The region satisfying all constraints of an LPP is called",
+o: [
+"Infeasible region",
+"Feasible region",
+"Objective region",
+"Solution region"
+],
+a: 1
+},
+{
+q: "The corner point method is used in Linear Programming to",
+o: [
+"Find the optimal solution",
+"Reduce constraints",
+"Eliminate variables",
+"Convert inequalities"
+],
+a: 0
+},
+{
+q: "Slack variables are introduced in Linear Programming to",
+o: [
+"Convert inequalities into equalities",
+"Reduce objective function",
+"Eliminate decision variables",
+"Increase constraints"
+],
+a: 0
+},
+{
+q: "The simplex method is used to",
+o: [
+"Solve Linear Programming problems with many variables",
+"Draw graphs",
+"Design circuits",
+"Calculate derivatives"
+],
+a: 0
+},
+{
+q: "A transportation problem in Operations Research is concerned with",
+o: [
+"Minimizing transportation cost",
+"Designing vehicles",
+"Manufacturing products",
+"Scheduling employees"
+],
+a: 0
+},
+{
+q: "The transportation model assumes that",
+o: [
+"Supply equals demand",
+"Supply is always greater than demand",
+"Demand is unlimited",
+"There are no transportation costs"
+],
+a: 0
+},
+{
+q: "Which of the following methods provides an initial feasible solution to transportation problems?",
+o: [
+"North-West Corner method",
+"Simplex method",
+"Dynamic programming",
+"PERT method"
+],
+a: 0
+},
+{
+q: "Assignment problems are special cases of",
+o: [
+"Transportation problems",
+"Network models",
+"Game theory models",
+"Inventory models"
+],
+a: 0
+},
+{
+q: "The Hungarian method is used to solve",
+o: [
+"Assignment problems",
+"Linear programming",
+"Game theory",
+"Inventory control"
+],
+a: 0
+},
+{
+q: "Game theory deals with",
+o: [
+"Competitive decision making",
+"Database design",
+"Network routing",
+"Computer security"
+],
+a: 0
+},
+{
+q: "In game theory, a strategy that provides the best outcome regardless of opponent action is called",
+o: [
+"Dominant strategy",
+"Mixed strategy",
+"Random strategy",
+"Linear strategy"
+],
+a: 0
+},
+{
+q: "PERT stands for",
+o: [
+"Program Evaluation and Review Technique",
+"Project Evaluation and Research Technique",
+"Program Execution and Resource Technique",
+"Process Evaluation and Routing Technique"
+],
+a: 0
+},
+{
+q: "Critical Path Method (CPM) is used in project management to determine",
+o: [
+"The longest duration path in a project network",
+"The cheapest project activity",
+"The smallest activity",
+"The first project activity"
+],
+a: 0
+},
+
+
+
+{
+q: "Operations Research was first widely applied during",
+o: [
+"World War I",
+"World War II",
+"The Industrial Revolution",
+"The Cold War"
+],
+a: 1
+},
+{
+q: "The early development of Operations Research was mainly driven by the need to",
+o: [
+"Improve military decision making",
+"Develop programming languages",
+"Create operating systems",
+"Improve database systems"
+],
+a: 0
+},
+{
+q: "Operations Research is best described as the application of",
+o: [
+"Scientific and mathematical methods to decision making",
+"Programming languages to system design",
+"Statistics to accounting",
+"Algorithms to networking"
+],
+a: 0
+},
+{
+q: "Which of the following contributed significantly to the development of Operations Research?",
+o: [
+"Military logistics problems",
+"Word processing systems",
+"Computer graphics",
+"Text editing software"
+],
+a: 0
+},
+{
+q: "One of the earliest applications of Operations Research was in",
+o: [
+"Military strategy and resource allocation",
+"Mobile phone design",
+"Website development",
+"Cloud computing"
+],
+a: 0
+},
+{
+q: "A model in Operations Research is",
+o: [
+"A simplified representation of a real system",
+"A computer program",
+"A hardware configuration",
+"A database table"
+],
+a: 0
+},
+{
+q: "Which of the following is NOT a type of Operations Research model?",
+o: [
+"Iconic model",
+"Analog model",
+"Mathematical model",
+"Mechanical model"
+],
+a: 3
+},
+{
+q: "Mathematical models in Operations Research use",
+o: [
+"Equations and inequalities",
+"Computer hardware",
+"Programming languages",
+"Machine instructions"
+],
+a: 0
+},
+{
+q: "The main advantage of modeling in Operations Research is that it",
+o: [
+"Allows analysis of complex systems",
+"Eliminates decision making",
+"Removes uncertainty completely",
+"Replaces management"
+],
+a: 0
+},
+{
+q: "In Operations Research modeling, decision variables represent",
+o: [
+"Unknown quantities to be determined",
+"Computer memory locations",
+"Fixed system parameters",
+"External disturbances"
+],
+a: 0
+},
+{
+q: "Constraints in an optimization model represent",
+o: [
+"Limitations or restrictions on decision variables",
+"Objectives to be maximized",
+"Random events in a system",
+"Input devices"
+],
+a: 0
+},
+{
+q: "The function that must be maximized or minimized in an optimization problem is called",
+o: [
+"Objective function",
+"Constraint function",
+"Decision function",
+"Evaluation function"
+],
+a: 0
+},
+{
+q: "An optimization problem aims to",
+o: [
+"Find the best solution among feasible alternatives",
+"Eliminate all constraints",
+"Increase the number of variables",
+"Remove decision variables"
+],
+a: 0
+},
+{
+q: "A solution that satisfies all constraints of a model is called",
+o: [
+"Feasible solution",
+"Infeasible solution",
+"Optimal constraint",
+"Objective variable"
+],
+a: 0
+},
+{
+q: "The best feasible solution to an optimization problem is called",
+o: [
+"Optimal solution",
+"Feasible solution",
+"Constraint solution",
+"Linear solution"
+],
+a: 0
+},
+{
+q: "Which of the following is an essential component of an optimization model?",
+o: [
+"Decision variables",
+"Keyboard input",
+"Printer output",
+"Operating system"
+],
+a: 0
+},
+{
+q: "An Operations Research model that uses mathematical expressions to represent relationships is called",
+o: [
+"Mathematical model",
+"Iconic model",
+"Graphical model",
+"Logical model"
+],
+a: 0
+},
+{
+q: "The process of developing a mathematical representation of a real-life problem is called",
+o: [
+"Model formulation",
+"Programming",
+"Implementation",
+"Simulation"
+],
+a: 0
+},
+{
+q: "In Operations Research, parameters in a model represent",
+o: [
+"Known constants",
+"Unknown decision variables",
+"Random decisions",
+"System outputs"
+],
+a: 0
+},
+{
+q: "Optimization techniques are mainly used in Operations Research to",
+o: [
+"Achieve the best possible decision under given constraints",
+"Eliminate mathematical models",
+"Remove system limitations",
+"Increase computer speed"
+],
+a: 0
+},
+{
+q: "Which of the following conditions must be satisfied for a mathematical model to represent a valid optimization problem?",
+o: [
+"The objective function must depend on decision variables",
+"All constraints must be linear",
+"The feasible region must contain only one solution",
+"The model must contain at least two objective functions"
+],
+a: 0
+},
+
+
+
+//Hard ones 
+{
+q: "The graphical method for solving Linear Programming problems is applicable when the number of decision variables is",
+o: [
+"One",
+"Two",
+"Three",
+"More than three"
+],
+a: 1
+},
+{
+q: "In the graphical solution of an LPP, the optimal solution occurs at",
+o: [
+"The center of the feasible region",
+"Any interior point",
+"A corner point of the feasible region",
+"The midpoint of the axes"
+],
+a: 2
+},
+{
+q: "If the feasible region of a Linear Programming problem is unbounded, the optimal solution",
+o: [
+"Must occur at the origin",
+"May not exist",
+"Always occurs at infinity",
+"Must occur at a boundary"
+],
+a: 1
+},
+{
+q: "A constraint that does not affect the feasible region of a Linear Programming problem is called",
+o: [
+"Redundant constraint",
+"Slack constraint",
+"Artificial constraint",
+"Surplus constraint"
+],
+a: 0
+},
+{
+q: "In the simplex method, the variable that enters the basis is selected based on",
+o: [
+"The most negative coefficient in the objective row",
+"The smallest coefficient in constraints",
+"The largest RHS value",
+"The smallest pivot element"
+],
+a: 0
+},
+{
+q: "The simplex method is primarily used to",
+o: [
+"Solve Linear Programming problems with many variables",
+"Draw graphs of constraints",
+"Eliminate redundant variables",
+"Solve quadratic equations"
+],
+a: 0
+},
+{
+q: "In the simplex method, the variable leaving the basis is determined using",
+o: [
+"Maximum ratio test",
+"Minimum ratio test",
+"Pivot test",
+"Feasible region test"
+],
+a: 1
+},
+{
+q: "A Linear Programming problem is said to be degenerate when",
+o: [
+"A basic variable takes the value zero",
+"The feasible region disappears",
+"All constraints are equalities",
+"There are more variables than constraints"
+],
+a: 0
+},
+{
+q: "If during simplex iterations no positive ratio can be found, the solution is",
+o: [
+"Optimal",
+"Degenerate",
+"Unbounded",
+"Infeasible"
+],
+a: 2
+},
+{
+q: "Artificial variables are introduced in Linear Programming mainly to",
+o: [
+"Obtain an initial feasible solution",
+"Reduce the number of constraints",
+"Increase decision variables",
+"Convert minimization to maximization"
+],
+a: 0
+},
+{
+q: "The Big-M method is used in Linear Programming to",
+o: [
+"Penalize artificial variables in the objective function",
+"Remove slack variables",
+"Reduce computational steps",
+"Convert inequalities to equations"
+],
+a: 0
+},
+{
+q: "In Linear Programming, a slack variable is added to",
+o: [
+"Convert ≤ constraint to equality",
+"Convert ≥ constraint to equality",
+"Increase objective value",
+"Reduce decision variables"
+],
+a: 0
+},
+{
+q: "A surplus variable is introduced in a constraint of type",
+o: [
+"≤",
+"≥",
+"=",
+"<"
+],
+a: 1
+},
+{
+q: "Integer Programming differs from Linear Programming because",
+o: [
+"Decision variables must take integer values",
+"Constraints are nonlinear",
+"The objective function is quadratic",
+"Variables cannot be positive"
+],
+a: 0
+},
+{
+q: "Integer Programming problems are generally harder to solve because",
+o: [
+"The feasible region is discrete",
+"There are no constraints",
+"The objective function is linear",
+"There are too many slack variables"
+],
+a: 0
+},
+{
+q: "A Linear Programming problem in which some variables must take integer values is called",
+o: [
+"Mixed Integer Programming",
+"Pure Integer Programming",
+"Binary Programming",
+"Fractional Programming"
+],
+a: 0
+},
+{
+q: "Binary Integer Programming is a special case where variables can take values",
+o: [
+"0 or 1",
+"1 or 2",
+"-1 or 1",
+"Any integer"
+],
+a: 0
+},
+{
+q: "The branch and bound method is commonly used to solve",
+o: [
+"Integer Programming problems",
+"Transportation problems",
+"Network flow problems",
+"Game theory problems"
+],
+a: 0
+},
+{
+q: "The feasible region in Integer Programming is",
+o: [
+"A continuous region",
+"A set of discrete points",
+"A circular region",
+"A triangular region"
+],
+a: 1
+},
+{
+q: "Which of the following best explains why graphical methods cannot solve most Integer Programming problems?",
+o: [
+"They require discrete feasible points",
+"They require nonlinear constraints",
+"They require more than one objective",
+"They cannot handle inequalities"
+],
+a: 0
+},
+
+
+{
+q: "Dynamic programming is primarily used to solve problems that can be broken into",
+o: [
+"Independent unrelated stages",
+"Multiple interdependent stages",
+"Single decision stage",
+"Random decision stages"
+],
+a: 1
+},
+{
+q: "The fundamental principle of dynamic programming is known as",
+o: [
+"Principle of linearity",
+"Principle of recursion",
+"Principle of optimality",
+"Principle of feasibility"
+],
+a: 2
+},
+{
+q: "According to Bellman's principle of optimality, an optimal policy has the property that",
+o: [
+"Each stage decision is independent",
+"Optimal solutions contain optimal sub-solutions",
+"All variables must be integers",
+"The objective function must be linear"
+],
+a: 1
+},
+{
+q: "Dynamic programming problems are usually solved using",
+o: [
+"Forward or backward recursion",
+"Graphical analysis",
+"Simplex iteration",
+"Matrix inversion"
+],
+a: 0
+},
+{
+q: "In dynamic programming terminology, a 'stage' represents",
+o: [
+"A decision point in the problem",
+"A constraint in the model",
+"A variable coefficient",
+"A slack variable"
+],
+a: 0
+},
+{
+q: "A transportation model is primarily concerned with",
+o: [
+"Minimizing transportation cost from sources to destinations",
+"Maximizing production output",
+"Scheduling employees",
+"Balancing project duration"
+],
+a: 0
+},
+{
+q: "A transportation problem is said to be balanced when",
+o: [
+"Total supply equals total demand",
+"Supply exceeds demand",
+"Demand exceeds supply",
+"Transportation cost is zero"
+],
+a: 0
+},
+{
+q: "If total supply does not equal total demand in a transportation problem, the problem is balanced by introducing",
+o: [
+"A dummy row or column",
+"A slack variable",
+"An artificial variable",
+"A decision variable"
+],
+a: 0
+},
+{
+q: "Which of the following methods is used to obtain an initial feasible solution for a transportation problem?",
+o: [
+"North-West Corner method",
+"Simplex method",
+"Branch and bound",
+"Hungarian method"
+],
+a: 0
+},
+{
+q: "Which method often produces a better initial solution than the North-West Corner method?",
+o: [
+"Least Cost method",
+"Graphical method",
+"Simplex method",
+"Dynamic programming"
+],
+a: 0
+},
+{
+q: "The method used to test the optimality of a transportation solution is",
+o: [
+"MODI method",
+"Simplex method",
+"Hungarian method",
+"Bellman method"
+],
+a: 0
+},
+{
+q: "In a transportation table with m sources and n destinations, the number of basic variables in a non-degenerate solution is",
+o: [
+"m + n − 1",
+"m × n",
+"m + n",
+"m − n"
+],
+a: 0
+},
+{
+q: "A transportation solution is said to be degenerate when",
+o: [
+"The number of allocations is less than m + n − 1",
+"The cost becomes zero",
+"Supply equals demand",
+"There are multiple optimal solutions"
+],
+a: 0
+},
+{
+q: "The assignment problem is a special case of",
+o: [
+"Transportation problem",
+"Dynamic programming",
+"Inventory model",
+"Game theory"
+],
+a: 0
+},
+{
+q: "The objective of the assignment problem is to",
+o: [
+"Assign tasks to agents with minimum cost or maximum profit",
+"Maximize supply",
+"Minimize number of constraints",
+"Increase number of decision variables"
+],
+a: 0
+},
+{
+q: "The Hungarian method is used to solve",
+o: [
+"Assignment problems",
+"Transportation problems",
+"Integer programming problems",
+"Dynamic programming problems"
+],
+a: 0
+},
+{
+q: "Before applying the Hungarian method to a profit matrix, it must first be converted into",
+o: [
+"A cost matrix",
+"A transportation table",
+"A simplex table",
+"A feasibility matrix"
+],
+a: 0
+},
+{
+q: "If the number of tasks and agents are unequal in an assignment problem, it is balanced by introducing",
+o: [
+"A dummy row or column",
+"A slack variable",
+"An artificial variable",
+"A pivot element"
+],
+a: 0
+},
+{
+q: "In the Hungarian method, the first step involves",
+o: [
+"Row reduction",
+"Column elimination",
+"Pivot selection",
+"Ratio test"
+],
+a: 0
+},
+{
+q: "An assignment problem ensures that",
+o: [
+"Each task is assigned to exactly one agent",
+"Each agent performs multiple tasks simultaneously",
+"All tasks are ignored",
+"No cost is incurred"
+],
+a: 0
+},
+
+
+{
+q: "Which method is commonly used to obtain an initial basic feasible solution in a transportation problem?",
+o: [
+"North-West Corner method",
+"Simplex method",
+"Hungarian method",
+"Branch and bound method"
+],
+a: 0
+},
+{
+q: "The North-West Corner method begins allocation from",
+o: [
+"The top-left corner of the transportation table",
+"The lowest cost cell",
+"The bottom-right corner",
+"The middle of the table"
+],
+a: 0
+},
+{
+q: "Which transportation method allocates to the cell with the lowest transportation cost first?",
+o: [
+"Least Cost method",
+"North-West Corner method",
+"MODI method",
+"Graphical method"
+],
+a: 0
+},
+{
+q: "Vogel’s Approximation Method improves the initial solution by using",
+o: [
+"Penalty costs",
+"Graphical points",
+"Simplex pivots",
+"Artificial variables"
+],
+a: 0
+},
+{
+q: "In Vogel’s Approximation Method, the penalty is determined by",
+o: [
+"The difference between the two smallest costs in a row or column",
+"The largest cost in a row",
+"The total supply of a row",
+"The total demand of a column"
+],
+a: 0
+},
+{
+q: "A basic feasible solution in a transportation problem must satisfy",
+o: [
+"All supply and demand constraints",
+"Only supply constraints",
+"Only demand constraints",
+"No constraints"
+],
+a: 0
+},
+{
+q: "For a transportation problem with m sources and n destinations, a basic feasible solution contains",
+o: [
+"m + n − 1 allocations",
+"m × n allocations",
+"m + n allocations",
+"m − n allocations"
+],
+a: 0
+},
+{
+q: "A transportation solution is said to be degenerate when",
+o: [
+"The number of allocations is less than m + n − 1",
+"The supply equals demand",
+"Transportation cost becomes zero",
+"There are too many constraints"
+],
+a: 0
+},
+{
+q: "Degeneracy in a transportation problem can be handled by introducing",
+o: [
+"A very small quantity in an empty cell",
+"A slack variable",
+"A surplus variable",
+"A decision variable"
+],
+a: 0
+},
+{
+q: "Which method is used to test whether a transportation solution is optimal?",
+o: [
+"MODI method",
+"North-West Corner method",
+"Least Cost method",
+"Graphical method"
+],
+a: 0
+},
+{
+q: "The MODI method is also called the",
+o: [
+"u-v method",
+"Penalty method",
+"Graphical method",
+"Simplex method"
+],
+a: 0
+},
+{
+q: "A transportation problem is balanced when",
+o: [
+"Total supply equals total demand",
+"Total supply is greater than demand",
+"Total demand is greater than supply",
+"Transportation cost is equal"
+],
+a: 0
+},
+{
+q: "If supply exceeds demand in a transportation problem, balance is achieved by adding",
+o: [
+"A dummy destination",
+"A dummy source",
+"A slack variable",
+"A surplus constraint"
+],
+a: 0
+},
+{
+q: "If demand exceeds supply in a transportation problem, balance is achieved by adding",
+o: [
+"A dummy source",
+"A dummy destination",
+"A slack variable",
+"A surplus variable"
+],
+a: 0
+},
+{
+q: "Which initial solution method usually gives a better starting solution than the North-West Corner method?",
+o: [
+"Vogel’s Approximation Method",
+"Graphical method",
+"Simplex method",
+"Row reduction method"
+],
+a: 0
+},
+{
+q: "Which transportation method ignores transportation cost during the initial allocation?",
+o: [
+"North-West Corner method",
+"Least Cost method",
+"Vogel’s Approximation Method",
+"MODI method"
+],
+a: 0
+},
+{
+q: "In improving a transportation solution, adjustments are made along a",
+o: [
+"Closed loop",
+"Straight line",
+"Diagonal path",
+"Single column"
+],
+a: 0
+},
+{
+q: "A loop used for improving a transportation solution must contain",
+o: [
+"Alternating horizontal and vertical moves",
+"Only horizontal moves",
+"Only vertical moves",
+"Random moves"
+],
+a: 0
+},
+{
+q: "A transportation problem with more than one optimal solution occurs when",
+o: [
+"An empty cell has zero opportunity cost",
+"The cost becomes negative",
+"The supply equals demand",
+"There are fewer allocations"
+],
+a: 0
+},
+{
+q: "The purpose of solving a transportation problem is to",
+o: [
+"Minimize total transportation cost",
+"Increase supply",
+"Maximize demand",
+"Eliminate constraints"
+],
+a: 0
+}
+  
+];
+
+let current = 0;
+let score = 0;
+
+// ✅ Pick 60 random questions WITHOUT modifying quizData
+function pickRandomQuestions(bank, count) {
+  const copy = [...bank];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
+
+const examData = pickRandomQuestions(quizData, 60);
+
+let answers = new Array(examData.length).fill(null);
+let shuffledOptions = new Array(examData.length).fill(null);
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const counterEl = document.getElementById("counter");
+const resultEl = document.getElementById("result");
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function loadQuestion() {
+  const q = examData[current];
+
+  counterEl.textContent = `Question ${current + 1} of ${examData.length}`;
+  questionEl.innerHTML = q.q;
+  optionsEl.innerHTML = "";
+
+  prevBtn.disabled = current === 0;
+
+  let optionsToRender;
+
+  if (shuffledOptions[current] === null) {
+    optionsToRender = q.o.map((text, index) => ({
+      text,
+      originalIndex: index
+    }));
+
+    shuffleArray(optionsToRender);
+    shuffledOptions[current] = optionsToRender;
+  } else {
+    optionsToRender = shuffledOptions[current];
+  }
+
+  optionsToRender.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.text;
+
+    if (answers[current] !== null) {
+      btn.disabled = true;
+
+      if (opt.originalIndex === q.a) {
+        btn.classList.add("correct");
+      }
+
+      if (
+        opt.originalIndex === answers[current] &&
+        answers[current] !== q.a
+      ) {
+        btn.classList.add("wrong");
+      }
+    }
+
+    btn.onclick = () => selectAnswer(opt.originalIndex);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(index) {
+  if (answers[current] !== null) return;
+
+  answers[current] = index;
+  if (index === examData[current].a) score++;
+
+  loadQuestion();
+}
+
+nextBtn.onclick = () => {
+  if (current < examData.length - 1) {
+    current++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+prevBtn.onclick = () => {
+  if (current > 0) {
+    current--;
+    loadQuestion();
+  }
+};
+
+function showResult() {
+  questionEl.style.display = "none";
+  optionsEl.style.display = "none";
+  counterEl.style.display = "none";
+  document.querySelector(".nav-buttons").style.display = "none";
+
+  const percentage = ((score / examData.length) * 100).toFixed(2);
+  resultEl.style.display = "block";
+  restartBtn.style.display ="block";
+
+  resultEl.innerHTML = `
+    <p><strong>Quiz Completed</strong></p>
+    <p>Score: ${score} / ${examData.length}</p>
+    <p>Percentage: ${percentage}%</p>
+  `;
+}
+
+restartBtn.onclick = () => {
+  current = 0;
+  score = 0;
+
+  const newExamData = pickRandomQuestions(quizData, 60);
+  examData.length = 0;
+  examData.push(...newExamData);
+
+  answers = new Array(examData.length).fill(null);
+  shuffledOptions = new Array(examData.length).fill(null);
+
+  questionEl.style.display = "block";
+  optionsEl.style.display = "block";
+  counterEl.style.display = "block";
+  document.querySelector(".nav-buttons").style.display = "flex";
+  resultEl.style.display = "none";
+  restartBtn.style.display = "none";
+
+  prevBtn.disabled = true;
+  nextBtn.disabled = false;
+
+  loadQuestion();
+};
+
+loadQuestion();
+</script>
+
+</body>
+</html>
